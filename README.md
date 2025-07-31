@@ -21,6 +21,7 @@ A nostalgic photobooth web application that celebrates Apple's iconic design era
 - **ASCII**: Text-based art conversion
 - **Pixelate**: 8-bit retro gaming style
 - **Scanlines**: TV/monitor effect
+- **Matrix**: Green digital rain with falling characters (like Neo in The Matrix!)
 
 ### ✨ Additional Features
 - **Real-time filter preview**: See filters applied to your camera feed before taking photos
