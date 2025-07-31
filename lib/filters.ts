@@ -26,6 +26,15 @@ export const applyFilter = (
     case "matrix":
       applyMatrixFilter(ctx, canvas.width, canvas.height);
       return; // Skip putImageData as Matrix modifies canvas directly
+    case "gameboy":
+      applyGameBoyFilter(data);
+      break;
+    case "thermal":
+      applyThermalFilter(data);
+      break;
+    case "vhs":
+      applyVHSFilter(ctx, canvas.width, canvas.height);
+      return; // Skip putImageData as VHS modifies canvas directly
     case "none":
     default:
       return;
@@ -311,5 +320,133 @@ const applyMatrixFilter = (
   
   // Add subtle green overlay for extra Matrix effect
   ctx.fillStyle = "rgba(0, 50, 0, 0.1)";
+  ctx.fillRect(0, 0, width, height);
+};
+
+const applyGameBoyFilter = (data: Uint8ClampedArray) => {
+  // Classic Game Boy LCD color palette
+  const palette = [
+    { r: 15, g: 56, b: 15 },   // Dark green (darkest)
+    { r: 48, g: 98, b: 48 },   // Medium dark green
+    { r: 139, g: 172, b: 15 }, // Medium light green
+    { r: 155, g: 188, b: 15 }  // Light green (brightest)
+  ];
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Convert to grayscale
+    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    
+    // Map grayscale to Game Boy palette (4 shades)
+    let paletteIndex;
+    if (gray < 64) paletteIndex = 0;
+    else if (gray < 128) paletteIndex = 1;
+    else if (gray < 192) paletteIndex = 2;
+    else paletteIndex = 3;
+    
+    const color = palette[paletteIndex];
+    data[i] = color.r;
+    data[i + 1] = color.g;
+    data[i + 2] = color.b;
+    // Alpha stays the same
+  }
+};
+
+const applyThermalFilter = (data: Uint8ClampedArray) => {
+  for (let i = 0; i < data.length; i += 4) {
+    // Convert to grayscale to determine "temperature"
+    const intensity = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    
+    // Map intensity to thermal colors (cold=blue to hot=red)
+    let r, g, b;
+    
+    if (intensity < 64) {
+      // Cold - Blue to Purple
+      r = Math.floor(intensity * 2);
+      g = 0;
+      b = 255;
+    } else if (intensity < 128) {
+      // Cool - Purple to Black
+      const factor = (intensity - 64) / 64;
+      r = Math.floor(128 * factor);
+      g = 0;
+      b = Math.floor(255 * (1 - factor));
+    } else if (intensity < 192) {
+      // Warm - Black to Red
+      const factor = (intensity - 128) / 64;
+      r = Math.floor(255 * factor);
+      g = 0;
+      b = 0;
+    } else {
+      // Hot - Red to Yellow to White
+      const factor = (intensity - 192) / 63;
+      r = 255;
+      g = Math.floor(255 * factor);
+      b = Math.floor(100 * factor); // Slight blue for very hot
+    }
+    
+    data[i] = r;
+    data[i + 1] = g;
+    data[i + 2] = b;
+    // Alpha stays the same
+  }
+};
+
+const applyVHSFilter = (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number
+) => {
+  // Get the image data first
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  
+  // Apply VHS color effects - reduce saturation and add color bleeding
+  for (let i = 0; i < data.length; i += 4) {
+    // Reduce saturation and add slight color shift
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    
+    // Reduce overall saturation
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    data[i] = Math.floor(r * 0.8 + gray * 0.2);     // Reduce red
+    data[i + 1] = Math.floor(g * 0.9 + gray * 0.1); // Keep green stronger
+    data[i + 2] = Math.floor(b * 0.7 + gray * 0.3); // Reduce blue more
+    
+    // Add slight noise
+    const noise = (Math.random() - 0.5) * 20;
+    data[i] = Math.max(0, Math.min(255, data[i] + noise));
+    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+  }
+  
+  // Put the modified image back
+  ctx.putImageData(imageData, 0, 0);
+  
+  // Add horizontal tracking lines
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+  ctx.lineWidth = 1;
+  
+  for (let y = 0; y < height; y += 4) {
+    // Random slight offset for tracking lines
+    const offset = Math.sin(y * 0.1) * 2;
+    ctx.beginPath();
+    ctx.moveTo(offset, y);
+    ctx.lineTo(width + offset, y);
+    ctx.stroke();
+  }
+  
+  // Add subtle color bleeding effect
+  ctx.fillStyle = "rgba(255, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, width, height);
+  
+  // Add slight vignette
+  const gradient = ctx.createRadialGradient(
+    width / 2, height / 2, 0,
+    width / 2, height / 2, Math.max(width, height) / 2
+  );
+  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0.2)");
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
 };

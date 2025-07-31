@@ -18,7 +18,10 @@ export type PhotoFilter =
   | "ascii"
   | "pixelate"
   | "scanlines"
-  | "matrix";
+  | "matrix"
+  | "gameboy"
+  | "thermal"
+  | "vhs";
 
 export interface CameraSettings {
   width: number;

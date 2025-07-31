@@ -22,6 +22,9 @@ A nostalgic photobooth web application that celebrates Apple's iconic design era
 - **Pixelate**: 8-bit retro gaming style
 - **Scanlines**: TV/monitor effect
 - **Matrix**: Green digital rain with falling characters (like Neo in The Matrix!)
+- **Game Boy**: Classic Nintendo Game Boy LCD green monochrome
+- **Thermal**: Heat vision camera with temperature color mapping
+- **VHS**: 80s home video with tracking lines and color distortion
 
 ### ✨ Additional Features
 - **Real-time filter preview**: See filters applied to your camera feed before taking photos

@@ -23,7 +23,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   canCapture,
 }) => {
   const modes: PhotoMode[] = ["single", "burst", "strip"];
-  const filters: PhotoFilter[] = ["none", "dither", "crt", "sepia", "ascii", "pixelate", "scanlines", "matrix"];
+  const filters: PhotoFilter[] = ["none", "dither", "crt", "sepia", "ascii", "pixelate", "scanlines", "matrix", "gameboy", "thermal", "vhs"];
 
   const getButtonClass = () => {
     switch (theme) {
