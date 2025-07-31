@@ -23,6 +23,9 @@ export const applyFilter = (
     case "ascii":
       applyAsciiFilter(ctx, canvas.width, canvas.height);
       return; // Skip putImageData as ASCII modifies canvas directly
+    case "matrix":
+      applyMatrixFilter(ctx, canvas.width, canvas.height);
+      return; // Skip putImageData as Matrix modifies canvas directly
     case "none":
     default:
       return;
@@ -203,4 +206,110 @@ export const addScanlines = (canvas: HTMLCanvasElement) => {
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
   }
+};
+
+// Matrix-style falling characters state
+interface MatrixColumn {
+  x: number;
+  y: number;
+  speed: number;
+  chars: string[];
+  charIndex: number;
+}
+
+let matrixColumns: MatrixColumn[] = [];
+let matrixLastUpdate = 0;
+
+const applyMatrixFilter = (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number
+) => {
+  // Matrix character set (katakana, numbers, symbols)
+  const matrixChars = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789+-*/=<>[]{}";
+  
+  // Get current image data and apply green monochrome effect
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  
+  // Convert to green monochrome with high contrast
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    const intensity = gray > 128 ? 255 : Math.floor(gray * 0.7); // High contrast
+    
+    data[i] = 0; // Red = 0
+    data[i + 1] = intensity; // Green = processed intensity
+    data[i + 2] = 0; // Blue = 0
+    // Alpha stays the same
+  }
+  
+  // Put the processed image back
+  ctx.putImageData(imageData, 0, 0);
+  
+  // Initialize matrix columns if needed
+  const columnWidth = 20;
+  const numColumns = Math.ceil(width / columnWidth);
+  
+  if (matrixColumns.length !== numColumns) {
+    matrixColumns = [];
+    for (let i = 0; i < numColumns; i++) {
+      matrixColumns.push({
+        x: i * columnWidth,
+        y: Math.random() * height,
+        speed: 2 + Math.random() * 8,
+        chars: Array.from({ length: 20 }, () => 
+          matrixChars[Math.floor(Math.random() * matrixChars.length)]
+        ),
+        charIndex: 0,
+      });
+    }
+  }
+  
+  // Update matrix animation
+  const currentTime = Date.now();
+  if (currentTime - matrixLastUpdate > 100) { // Update every 100ms
+    matrixColumns.forEach(column => {
+      column.y += column.speed;
+      column.charIndex = (column.charIndex + 1) % column.chars.length;
+      
+      // Reset column when it goes off screen
+      if (column.y > height + 100) {
+        column.y = -100;
+        column.speed = 2 + Math.random() * 8;
+        // Randomize characters
+        column.chars = Array.from({ length: 20 }, () => 
+          matrixChars[Math.floor(Math.random() * matrixChars.length)]
+        );
+      }
+    });
+    matrixLastUpdate = currentTime;
+  }
+  
+  // Draw matrix rain effect
+  ctx.font = "18px monospace";
+  ctx.textAlign = "center";
+  
+  matrixColumns.forEach(column => {
+    const numCharsInColumn = 15;
+    
+    for (let i = 0; i < numCharsInColumn; i++) {
+      const charY = column.y - (i * 20);
+      if (charY < 0 || charY > height) continue;
+      
+      // Fade effect - brighter at the front, dimmer trailing
+      const alpha = Math.max(0, 1 - (i / numCharsInColumn));
+      const brightness = i === 0 ? 255 : Math.floor(255 * alpha * 0.7);
+      
+      ctx.fillStyle = `rgba(0, ${brightness}, 0, ${alpha})`;
+      
+      const charIndex = (column.charIndex + i) % column.chars.length;
+      const char = column.chars[charIndex];
+      
+      ctx.fillText(char, column.x + 10, charY);
+    }
+  });
+  
+  // Add subtle green overlay for extra Matrix effect
+  ctx.fillStyle = "rgba(0, 50, 0, 0.1)";
+  ctx.fillRect(0, 0, width, height);
 };

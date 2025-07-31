@@ -17,7 +17,8 @@ export type PhotoFilter =
   | "sepia"
   | "ascii"
   | "pixelate"
-  | "scanlines";
+  | "scanlines"
+  | "matrix";
 
 export interface CameraSettings {
   width: number;
