@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+  }
+
+  @font-face {
+    font-family: 'Chicago';
+    src: url('/fonts/chicago.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  }
+}
+
+@layer components {
+  /* Classic Mac window styling */
+  .mac-window {
+    @apply bg-white border-2 border-black shadow-mac-window;
+  }
+
+  .mac-title-bar {
+    @apply bg-black text-white px-2 py-1 flex items-center justify-between;
+    font-family: 'Chicago', monospace;
+    font-size: 12px;
+  }
+
+  .mac-button {
+    @apply bg-white border-2 border-black px-4 py-2 active:bg-black active:text-white;
+    font-family: 'Chicago', monospace;
+    font-size: 12px;
+  }
+
+  /* iMac G3 translucent styling */
+  .imac-window {
+    @apply rounded-3xl overflow-hidden;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 156, 199, 0.3);
+  }
+
+  .imac-button {
+    @apply rounded-full px-6 py-3 font-bold transition-all;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+    backdrop-filter: blur(5px);
+  }
+
+  /* Mac OS X Aqua styling */
+  .aqua-window {
+    @apply rounded-lg overflow-hidden shadow-mac-window;
+    background: linear-gradient(180deg, #F0F0F0 0%, #D8D8D8 100%);
+  }
+
+  .aqua-title-bar {
+    @apply h-6 bg-gradient-to-b from-gray-200 to-gray-300 flex items-center px-2;
+  }
+
+  .aqua-button {
+    @apply rounded-md px-4 py-2 font-medium;
+    background: linear-gradient(180deg, #FFFFFF 0%, #E0E0E0 50%, #CCCCCC 100%);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .aqua-button:active {
+    background: linear-gradient(180deg, #CCCCCC 0%, #E0E0E0 50%, #FFFFFF 100%);
+  }
+
+  /* Traffic light buttons */
+  .traffic-lights {
+    @apply flex gap-1;
+  }
+
+  .traffic-light {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  .traffic-light-red {
+    @apply bg-red-500;
+  }
+
+  .traffic-light-yellow {
+    @apply bg-yellow-500;
+  }
+
+  .traffic-light-green {
+    @apply bg-green-500;
+  }
+
+  /* CRT effect */
+  .crt-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crt-effect::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.06),
+      rgba(0, 255, 0, 0.02),
+      rgba(0, 0, 255, 0.06)
+    );
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+  }
+
+  /* Dithering pattern */
+  .dither-pattern {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+}
+
+@layer utilities {
+  /* Scanline animation */
+  @keyframes scanline {
+    0% {
+      top: 0;
+    }
+    100% {
+      top: 100%;
+    }
+  }
+
+  .scanline {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scanline::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    animation: scanline 8s linear infinite;
+  }
+
+  /* Flash effect */
+  @keyframes flash {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .flash-effect {
+    animation: flash 0.5s ease-out;
+  }
+}
