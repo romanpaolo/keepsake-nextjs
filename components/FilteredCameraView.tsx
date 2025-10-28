@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { AppleTheme, PhotoFilter } from "@/lib/types";
-import { applyFilter } from "@/lib/filters";
+import { applyFilter, addGrain } from "@/lib/filters";
 
 interface FilteredCameraViewProps {
   theme: AppleTheme;
@@ -54,6 +54,9 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
           if (selectedFilter !== "none") {
             applyFilter(canvas, selectedFilter);
           }
+
+          // Add film grain texture to all photos
+          addGrain(ctx, canvas.width, canvas.height, 12);
 
           lastFilterRef.current = selectedFilter;
         }

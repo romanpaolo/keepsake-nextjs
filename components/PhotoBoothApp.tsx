@@ -168,7 +168,7 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
           </div>
         )}
 
-        <div className="p-3 sm:p-4 md:p-6">
+        <div className="p-3 sm:p-4 md:p-6 flex flex-col gap-4">
           {!hasPermission ? (
             <div className="text-center py-12">
               <p className="mb-4 text-base sm:text-lg">Camera access is required to use the photobooth</p>
@@ -184,16 +184,47 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
               )}
             </div>
           ) : (
-            <div className="relative">
-              <FilteredCameraView
-                ref={filteredCameraRef}
-                videoRef={videoRef}
-                theme={theme}
-                isFlashing={isFlashing}
-                selectedFilter={selectedFilter}
-              />
-              {count !== null && <CountdownOverlay count={count} theme={theme} photoNumber={photoNumber} totalPhotos={totalPhotos} />}
-            </div>
+            <>
+              <div className="relative">
+                <FilteredCameraView
+                  ref={filteredCameraRef}
+                  videoRef={videoRef}
+                  theme={theme}
+                  isFlashing={isFlashing}
+                  selectedFilter={selectedFilter}
+                />
+                {count !== null && <CountdownOverlay count={count} theme={theme} photoNumber={photoNumber} totalPhotos={totalPhotos} />}
+              </div>
+
+              {/* Capture Button - Right Below Camera */}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleCapture}
+                  disabled={!hasPermission || isCountingDown}
+                  className={`px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold transition-all ${
+                    theme === "classic" ? "rounded-md" : theme === "imac" ? "rounded-full" : "text-black rounded-lg shadow-lg active:scale-95"
+                  }`}
+                  style={{
+                    background: theme === "classic"
+                      ? "radial-gradient(circle at 35% 35%, #800102 0%, #600001 60%, #4A0001 100%)"
+                      : theme === "imac"
+                      ? "radial-gradient(circle at 30% 30%, #E8B4B8 0%, #D4AF37 100%)"
+                      : "linear-gradient(180deg, #FFF9ED 0%, #F9F5E8 50%, #F3EED8 100%)",
+                    border: theme === "classic" ? "4px solid rgba(205, 149, 117, 0.5)" : theme === "imac" ? "3px solid #C8A8B8" : "none",
+                    color: theme === "classic" ? "#FFF8DC" : theme === "imac" ? "#FFF8F3" : undefined,
+                    boxShadow: theme === "classic"
+                      ? "inset 2px 2px 8px rgba(255, 248, 220, 0.08), 4px 6px 16px rgba(0, 0, 0, 0.3)"
+                      : theme === "imac"
+                      ? "0 0 30px rgba(232, 180, 184, 0.4), 0 8px 24px rgba(212, 175, 55, 0.3)"
+                      : undefined,
+                    width: "auto",
+                    minWidth: "140px",
+                  }}
+                >
+                  {isCountingDown ? "Get Ready..." : theme === "imac" ? "CAPTURE" : theme === "classic" ? "TAKE PHOTO" : "Take Photo"}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>

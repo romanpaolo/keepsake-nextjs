@@ -20,14 +20,38 @@ export const createPhotoStrip = async (
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
 
-  const photoWidth = 400;
-  const photoHeight = 300;
-  const padding = 20;
-  const blackBorder = 40; // Thick black film strip border
-  const bleedAmount = 3;  // Edge bleeding/overflow amount
+  // Print-ready dimensions: 2x6 inches at 300 DPI
+  // 2 inches wide × 300 DPI = 600px
+  // 6 inches tall × 300 DPI = 1800px
+  const printWidth = 600;   // 2 inches at 300 DPI
+  const printHeight = 1800; // 6 inches at 300 DPI
 
-  canvas.width = photoWidth + (padding * 2) + (blackBorder * 2);
-  canvas.height = (photoHeight * photos.length) + (padding * (photos.length + 1)) + (blackBorder * 2);
+  const blackBorder = 60;   // Black border around edge (0.2 inches)
+  const padding = 10;       // Space between photos
+  const bleedAmount = 3;    // Edge bleeding/overflow amount
+
+  // Calculate photo dimensions maintaining 4:3 aspect ratio
+  const photoWidth = printWidth - (blackBorder * 2);  // Full available width
+  const totalPadding = (photos.length - 1) * padding;
+  const availableHeight = printHeight - (blackBorder * 2) - totalPadding;
+  const photoHeight = availableHeight / photos.length; // Equal height for each photo
+
+  // Maintain 4:3 aspect ratio (most camera photos)
+  const aspectRatio = 4 / 3;
+  let finalPhotoWidth = photoWidth;
+  let finalPhotoHeight = photoWidth / aspectRatio;
+
+  // If photo height exceeds available space, scale down
+  if (finalPhotoHeight > photoHeight) {
+    finalPhotoHeight = photoHeight;
+    finalPhotoWidth = photoHeight * aspectRatio;
+  }
+
+  // Center photos horizontally within the width
+  const photoStartX = blackBorder + (photoWidth - finalPhotoWidth) / 2;
+
+  canvas.width = printWidth;
+  canvas.height = printHeight;
 
   // Black background (film strip look) - completely black
   ctx.fillStyle = "#000000";
@@ -39,41 +63,42 @@ export const createPhotoStrip = async (
     img.src = photos[i].dataUrl;
     await new Promise((resolve) => {
       img.onload = () => {
-        const x = blackBorder + padding;
+        // Calculate position for this photo
+        const x = photoStartX;
         const y = blackBorder + padding + (i * (photoHeight + padding));
 
-        // Draw photo with slight overflow into padding for bleed effect
-        ctx.drawImage(img, x - bleedAmount, y - bleedAmount, photoWidth + (bleedAmount * 2), photoHeight + (bleedAmount * 2));
+        // Draw photo with slight overflow into padding for bleed effect (maintains aspect ratio)
+        ctx.drawImage(img, x - bleedAmount, y - bleedAmount, finalPhotoWidth + (bleedAmount * 2), finalPhotoHeight + (bleedAmount * 2));
 
         // Add edge blur/fade effect (vignette-like bleeding)
-        const blurGradient = ctx.createLinearGradient(x, y, x + photoWidth, y);
+        const blurGradient = ctx.createLinearGradient(x, y, x + finalPhotoWidth, y);
         blurGradient.addColorStop(0, "rgba(0, 0, 0, 0.15)");
         blurGradient.addColorStop(0.1, "rgba(0, 0, 0, 0)");
         blurGradient.addColorStop(0.9, "rgba(0, 0, 0, 0)");
         blurGradient.addColorStop(1, "rgba(0, 0, 0, 0.15)");
         ctx.fillStyle = blurGradient;
-        ctx.fillRect(x, y, photoWidth, photoHeight);
+        ctx.fillRect(x, y, finalPhotoWidth, finalPhotoHeight);
 
         // Add vertical edge blur
-        const verticalGradient = ctx.createLinearGradient(x, y, x, y + photoHeight);
+        const verticalGradient = ctx.createLinearGradient(x, y, x, y + finalPhotoHeight);
         verticalGradient.addColorStop(0, "rgba(0, 0, 0, 0.1)");
         verticalGradient.addColorStop(0.08, "rgba(0, 0, 0, 0)");
         verticalGradient.addColorStop(0.92, "rgba(0, 0, 0, 0)");
         verticalGradient.addColorStop(1, "rgba(0, 0, 0, 0.1)");
         ctx.fillStyle = verticalGradient;
-        ctx.fillRect(x, y, photoWidth, photoHeight);
+        ctx.fillRect(x, y, finalPhotoWidth, finalPhotoHeight);
 
         resolve(null);
       };
     });
   }
 
-  // Add date stamp
+  // Add date stamp at bottom
   const date = new Date().toLocaleDateString();
-  ctx.fillStyle = theme === "classic" ? "#000000" : "#666666";
-  ctx.font = theme === "classic" ? "12px monospace" : "14px sans-serif";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "16px monospace";
   ctx.textAlign = "center";
-  ctx.fillText(date, canvas.width / 2, canvas.height - (blackBorder / 2));
+  ctx.fillText(date, canvas.width / 2, canvas.height - 20);
 
   return canvas.toDataURL("image/png");
 };

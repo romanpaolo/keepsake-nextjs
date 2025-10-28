@@ -169,17 +169,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         </div>
       </div>
 
-      {/* Capture Button */}
-      <div className="flex justify-center pt-4">
-        <button
-          onClick={onCapture}
-          disabled={!canCapture || isCountingDown}
-          className={getCaptureButtonClass()}
-          style={getCaptureButtonStyle()}
-        >
-          {isCountingDown ? "Get Ready..." : theme === "imac" ? "CAPTURE" : theme === "classic" ? "TAKE PHOTO" : "Take Photo"}
-        </button>
-      </div>
     </div>
   );
 };

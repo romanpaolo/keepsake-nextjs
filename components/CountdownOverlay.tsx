@@ -24,6 +24,10 @@ const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ count, theme, photo
 
   const getCountdownColor = () => {
     switch (theme) {
+      case "classic":
+        return "#800102";  // Vintage photobooth burgundy red
+      case "imac":
+        return "#D4AF37";  // Gold for glamour
       case "aqua":
         return "#F9F5E8";
       default:
@@ -65,7 +69,11 @@ const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ count, theme, photo
         className={`${getCountdownStyle()} animate-pulse transform scale-150`}
         style={{
           color: getCountdownColor(),
-          textShadow: theme === "aqua" ? "0 4px 8px rgba(0, 0, 0, 0.3)" : undefined,
+          textShadow: theme === "classic"
+            ? "0 2px 8px rgba(255, 248, 220, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)"
+            : theme === "imac"
+            ? "0 2px 8px rgba(255, 255, 255, 0.4)"
+            : theme === "aqua" ? "0 4px 8px rgba(0, 0, 0, 0.3)" : undefined,
         }}
       >
         {count > 0 ? count : ""}

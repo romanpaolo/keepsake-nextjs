@@ -239,55 +239,78 @@ const applyKodakFilmFilter = (data: Uint8ClampedArray) => {
 };
 
 // Kodak Portra 400 Filter
-// Based on: Soft, creamy skin tones, Exposure +0.12, Contrast -5
-// Highlights -22, Shadows +18, Vibrance +25, soft pastel look
+// Real Kodak Portra 400 characteristics:
+// - Natural, balanced colors (NOT oversaturated or orange)
+// - Excellent skin tone reproduction (subtle peachy tones)
+// - Slightly lifted shadows (open, never pure black)
+// - Soft, creamy highlights (compressed, not blown out)
+// - Fine grain (minimal and pleasant)
+// - Lower contrast than consumer films
+// - Slightly cool shadows, warm midtones
 const applyKodakPortraFilter = (data: Uint8ClampedArray) => {
   for (let i = 0; i < data.length; i += 4) {
     let r = data[i];
     let g = data[i + 1];
     let b = data[i + 2];
 
-    // Slight exposure boost
-    r *= 1.12;
-    g *= 1.12;
-    b *= 1.12;
-
-    // Reduce contrast for soft look
-    r = ((r / 255 - 0.5) * 0.95 + 0.5) * 255;
-    g = ((g / 255 - 0.5) * 0.95 + 0.5) * 255;
-    b = ((b / 255 - 0.5) * 0.95 + 0.5) * 255;
-
-    // Portra's signature creamy warmth
+    // Slight exposure boost (natural film exposure)
     r *= 1.08;
-    g *= 1.04;
-    b *= 0.97;
+    g *= 1.08;
+    b *= 1.08;
 
-    // Lift shadows (open up dark areas)
+    // Reduce contrast for soft, flattering look (lower than consumer film)
+    r = ((r / 255 - 0.5) * 0.90 + 0.5) * 255;
+    g = ((g / 255 - 0.5) * 0.90 + 0.5) * 255;
+    b = ((b / 255 - 0.5) * 0.90 + 0.5) * 255;
+
     const luminance = (r + g + b) / 3;
-    if (luminance < 100) {
-      const lift = 1.18;
+
+    // Subtle, natural skin tone warmth (peachy but not orange)
+    // Add warmth to midtones and highlights, cooler shadows
+    if (luminance > 100) {
+      // Warm midtones and highlights (subtle red/yellow boost)
+      r *= 1.05;
+      g *= 1.02;
+      b *= 0.98;
+    } else {
+      // Keep shadows slightly cooler (enhance blue slightly)
+      r *= 0.98;
+      g *= 0.98;
+      b *= 1.02;
+    }
+
+    // Lift shadows significantly (open up dark areas - no true blacks)
+    if (luminance < 60) {
+      const lift = 1.30;
+      r *= lift;
+      g *= lift;
+      b *= lift;
+    } else if (luminance < 100) {
+      const lift = 1.15;
       r *= lift;
       g *= lift;
       b *= lift;
     }
 
-    // Pull down highlights (soft, not blown out)
-    if (luminance > 180) {
-      const compress = 0.85;
+    // Pull down highlights gently (soft, creamy, not blown out)
+    if (luminance > 210) {
+      const compress = 0.90;
+      r *= compress;
+      g *= compress;
+      b *= compress;
+    } else if (luminance > 170) {
+      const compress = 0.95;
       r *= compress;
       g *= compress;
       b *= compress;
     }
 
-    // Boost vibrance for pastel quality
+    // Moderate vibrance for natural color (not oversaturated)
     const avg = (r + g + b) / 3;
-    const vibranceBoost = 1.25;
+    const vibranceBoost = 1.12;
     r = avg + (r - avg) * vibranceBoost;
     g = avg + (g - avg) * vibranceBoost;
     b = avg + (b - avg) * vibranceBoost;
-
-    // Portra green-magenta shift
-    g *= 1.02;
 
     data[i] = Math.max(0, Math.min(255, r));
     data[i + 1] = Math.max(0, Math.min(255, g));
@@ -346,7 +369,7 @@ const addVignette = (ctx: CanvasRenderingContext2D, width: number, height: numbe
 };
 
 // Add film grain
-const addGrain = (ctx: CanvasRenderingContext2D, width: number, height: number, amount: number) => {
+export const addGrain = (ctx: CanvasRenderingContext2D, width: number, height: number, amount: number) => {
   const imageData = ctx.getImageData(0, 0, width, height);
   const data = imageData.data;
   const grainStrength = amount / 100;
