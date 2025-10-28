@@ -32,7 +32,7 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
     facingMode: "user",
   };
 
-  const { videoRef, hasPermission, requestPermission, error, isLoading } = useCamera(cameraSettings);
+  const { videoRef, hasPermission, requestPermission, error, isLoading, switchCamera } = useCamera(cameraSettings);
   const { count, isCountingDown, photoNumber, totalPhotos, startCountdown } = useCountdown();
 
   const capturePhoto = useCallback(async (): Promise<Photo | null> => {
@@ -197,7 +197,26 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
               </div>
 
               {/* Capture Button - Right Below Camera */}
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-3 sm:gap-4">
+                {/* Camera Switch Button (Mobile Only) */}
+                <button
+                  onClick={switchCamera}
+                  disabled={!hasPermission || isCountingDown}
+                  className="flex lg:hidden items-center justify-center px-4 py-3 text-sm font-bold transition-all rounded-lg"
+                  title="Switch camera"
+                  style={{
+                    background: theme === "classic"
+                      ? "rgba(128, 1, 2, 0.3)"
+                      : theme === "imac"
+                      ? "rgba(212, 175, 55, 0.2)"
+                      : "rgba(0, 0, 0, 0.1)",
+                    color: theme === "classic" ? "#FFF8DC" : theme === "imac" ? "#D4AF37" : "#000",
+                    border: `2px solid ${theme === "classic" ? "rgba(128, 1, 2, 0.5)" : theme === "imac" ? "rgba(212, 175, 55, 0.5)" : "rgba(0, 0, 0, 0.2)"}`,
+                  }}
+                >
+                  📷
+                </button>
+
                 <button
                   onClick={handleCapture}
                   disabled={!hasPermission || isCountingDown}
