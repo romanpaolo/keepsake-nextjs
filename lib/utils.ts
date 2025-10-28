@@ -67,8 +67,35 @@ export const createPhotoStrip = async (
         const x = photoStartX;
         const y = blackBorder + padding + (i * (photoHeight + padding));
 
-        // Draw photo with slight overflow into padding for bleed effect (maintains aspect ratio)
-        ctx.drawImage(img, x - bleedAmount, y - bleedAmount, finalPhotoWidth + (bleedAmount * 2), finalPhotoHeight + (bleedAmount * 2));
+        // Calculate source image crop to maintain aspect ratio
+        const imgAspectRatio = img.width / img.height;
+        const targetAspectRatio = finalPhotoWidth / finalPhotoHeight;
+
+        let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+
+        // Crop source image to match target aspect ratio
+        if (imgAspectRatio > targetAspectRatio) {
+          // Source is wider - crop sides
+          sourceWidth = img.height * targetAspectRatio;
+          sourceX = (img.width - sourceWidth) / 2;
+        } else {
+          // Source is taller - crop top/bottom
+          sourceHeight = img.width / targetAspectRatio;
+          sourceY = (img.height - sourceHeight) / 2;
+        }
+
+        // Draw photo with proper cropping
+        ctx.drawImage(
+          img,
+          sourceX,
+          sourceY,
+          sourceWidth,
+          sourceHeight,
+          x - bleedAmount,
+          y - bleedAmount,
+          finalPhotoWidth + (bleedAmount * 2),
+          finalPhotoHeight + (bleedAmount * 2)
+        );
 
         // Add edge blur/fade effect (vignette-like bleeding)
         const blurGradient = ctx.createLinearGradient(x, y, x + finalPhotoWidth, y);
