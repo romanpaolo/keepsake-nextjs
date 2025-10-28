@@ -88,9 +88,9 @@ const apply35mmFilmFilter = (data: Uint8ClampedArray, width: number, height: num
 };
 
 // Vintage Photobooth Filter
-// Subtle brown-gray tone - mostly desaturated (90% grayscale)
-// Muted and understated, NOT orange or heavily sepia
-// Just a hint of warm undertone
+// Subtle brown-gray tone - mostly desaturated (~85% grayscale)
+// Classic vintage photo paper tone - warm taupe/beige
+// Not quite sepia, not quite grayscale - that perfect in-between
 const applyVintageSepiaFilter = (data: Uint8ClampedArray, width: number, height: number) => {
   for (let i = 0; i < data.length; i += 4) {
     let r = data[i];
@@ -105,15 +105,15 @@ const applyVintageSepiaFilter = (data: Uint8ClampedArray, width: number, height:
 
     // Lift blacks slightly for matte feel
     if (adjusted < 40) {
-      adjusted = adjusted * 0.8 + 10;
+      adjusted = adjusted * 0.8 + 12;
     }
 
     adjusted = Math.max(0, Math.min(255, adjusted));
 
-    // 3. VERY SUBTLE brown-gray tone (not orange!)
-    r = adjusted * 1.04;  // Barely any red boost (2%)
-    g = adjusted * 0.99;  // Slight green reduction (2%)
-    b = adjusted * 0.92;  // Modest blue reduction (6%)
+    // 3. Subtle warm brown-gray tone (just the right amount of warmth)
+    r = adjusted * 1.04;  // 4% red boost
+    g = adjusted * 0.99;  // 1% green reduction
+    b = adjusted * 0.92;  // 8% blue reduction
 
     data[i] = Math.max(0, Math.min(255, r));
     data[i + 1] = Math.max(0, Math.min(255, g));

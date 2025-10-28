@@ -19,62 +19,62 @@ export const createPhotoStrip = async (
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
-  
+
   const photoWidth = 400;
   const photoHeight = 300;
   const padding = 20;
-  const borderWidth = 10;
-  
-  canvas.width = photoWidth + (padding * 2) + (borderWidth * 2);
-  canvas.height = (photoHeight * photos.length) + (padding * (photos.length + 1)) + (borderWidth * 2);
-  
-  // Background based on theme
-  if (theme === "classic") {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = borderWidth;
-    ctx.strokeRect(borderWidth / 2, borderWidth / 2, canvas.width - borderWidth, canvas.height - borderWidth);
-  } else if (theme === "imac") {
-    // Gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, "#E6F3F7");
-    gradient.addColorStop(1, "#C1E4F0");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else if (theme === "aqua") {
-    ctx.fillStyle = "#F0F0F0";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-  
-  // Draw photos
+  const blackBorder = 40; // Thick black film strip border
+  const bleedAmount = 3;  // Edge bleeding/overflow amount
+
+  canvas.width = photoWidth + (padding * 2) + (blackBorder * 2);
+  canvas.height = (photoHeight * photos.length) + (padding * (photos.length + 1)) + (blackBorder * 2);
+
+  // Black background (film strip look) - completely black
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw photos with edge bleeding effect
   for (let i = 0; i < photos.length; i++) {
     const img = new Image();
     img.src = photos[i].dataUrl;
     await new Promise((resolve) => {
       img.onload = () => {
-        const y = borderWidth + padding + (i * (photoHeight + padding));
-        ctx.drawImage(img, borderWidth + padding, y, photoWidth, photoHeight);
-        
-        // Add frame for each photo
-        if (theme === "classic") {
-          ctx.strokeStyle = "#000000";
-          ctx.lineWidth = 2;
-          ctx.strokeRect(borderWidth + padding, y, photoWidth, photoHeight);
-        }
-        
+        const x = blackBorder + padding;
+        const y = blackBorder + padding + (i * (photoHeight + padding));
+
+        // Draw photo with slight overflow into padding for bleed effect
+        ctx.drawImage(img, x - bleedAmount, y - bleedAmount, photoWidth + (bleedAmount * 2), photoHeight + (bleedAmount * 2));
+
+        // Add edge blur/fade effect (vignette-like bleeding)
+        const blurGradient = ctx.createLinearGradient(x, y, x + photoWidth, y);
+        blurGradient.addColorStop(0, "rgba(0, 0, 0, 0.15)");
+        blurGradient.addColorStop(0.1, "rgba(0, 0, 0, 0)");
+        blurGradient.addColorStop(0.9, "rgba(0, 0, 0, 0)");
+        blurGradient.addColorStop(1, "rgba(0, 0, 0, 0.15)");
+        ctx.fillStyle = blurGradient;
+        ctx.fillRect(x, y, photoWidth, photoHeight);
+
+        // Add vertical edge blur
+        const verticalGradient = ctx.createLinearGradient(x, y, x, y + photoHeight);
+        verticalGradient.addColorStop(0, "rgba(0, 0, 0, 0.1)");
+        verticalGradient.addColorStop(0.08, "rgba(0, 0, 0, 0)");
+        verticalGradient.addColorStop(0.92, "rgba(0, 0, 0, 0)");
+        verticalGradient.addColorStop(1, "rgba(0, 0, 0, 0.1)");
+        ctx.fillStyle = verticalGradient;
+        ctx.fillRect(x, y, photoWidth, photoHeight);
+
         resolve(null);
       };
     });
   }
-  
+
   // Add date stamp
   const date = new Date().toLocaleDateString();
   ctx.fillStyle = theme === "classic" ? "#000000" : "#666666";
   ctx.font = theme === "classic" ? "12px monospace" : "14px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(date, canvas.width / 2, canvas.height - padding);
-  
+  ctx.fillText(date, canvas.width / 2, canvas.height - (blackBorder / 2));
+
   return canvas.toDataURL("image/png");
 };
 

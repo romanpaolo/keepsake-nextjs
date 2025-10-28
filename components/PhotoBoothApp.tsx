@@ -29,7 +29,7 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
   };
 
   const { videoRef, hasPermission, requestPermission, error, isLoading } = useCamera(cameraSettings);
-  const { count, isCountingDown, startCountdown } = useCountdown();
+  const { count, isCountingDown, photoNumber, totalPhotos, startCountdown } = useCountdown();
 
   const capturePhoto = useCallback(async (): Promise<Photo | null> => {
     const filteredCamera = filteredCameraRef.current;
@@ -53,22 +53,30 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
   const handleCapture = useCallback(async () => {
     if (!hasPermission || isCountingDown) return;
 
-    // Start countdown
-    await startCountdown(3);
-
-    // Flash effect
-    setIsFlashing(true);
-    playSound("flash");
-    setTimeout(() => setIsFlashing(false), 300);
-
     // Capture based on mode
     if (photoMode === "single") {
+      // Start countdown
+      await startCountdown(3);
+
+      // Flash effect
+      setIsFlashing(true);
+      playSound("flash");
+      setTimeout(() => setIsFlashing(false), 300);
+
       playSound("shutter");
       const photo = await capturePhoto();
       if (photo) {
         setPhotos(prev => [...prev, photo]);
       }
     } else if (photoMode === "burst") {
+      // Start countdown
+      await startCountdown(3);
+
+      // Flash effect
+      setIsFlashing(true);
+      playSound("flash");
+      setTimeout(() => setIsFlashing(false), 300);
+
       // Capture 3 photos in quick succession
       for (let i = 0; i < 3; i++) {
         playSound("shutter");
@@ -82,9 +90,19 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
       // Capture 4 photos for a strip
       const stripPhotos: Photo[] = [];
       for (let i = 0; i < 4; i++) {
-        if (i > 0) {
+        if (i === 0) {
+          // First photo - start countdown
           await startCountdown(3);
+        } else {
+          // Subsequent photos - get ready message then countdown
+          await startCountdown(3, i + 1, 4);
         }
+
+        // Flash effect before each photo
+        setIsFlashing(true);
+        playSound("flash");
+        setTimeout(() => setIsFlashing(false), 300);
+
         playSound("shutter");
         const photo = await capturePhoto();
         if (photo) {
@@ -154,14 +172,14 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
             </div>
           ) : (
             <div className="relative">
-              <FilteredCameraView 
+              <FilteredCameraView
                 ref={filteredCameraRef}
                 videoRef={videoRef}
-                theme={theme} 
+                theme={theme}
                 isFlashing={isFlashing}
                 selectedFilter={selectedFilter}
               />
-              {count !== null && <CountdownOverlay count={count} theme={theme} />}
+              {count !== null && <CountdownOverlay count={count} theme={theme} photoNumber={photoNumber} totalPhotos={totalPhotos} />}
             </div>
           )}
         </div>
