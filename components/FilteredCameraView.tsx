@@ -54,12 +54,7 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
           if (selectedFilter !== "none") {
             applyFilter(canvas, selectedFilter);
           }
-
-          // Apply scanlines only if it's the selected filter
-          if (selectedFilter === "scanlines") {
-            addScanlines(canvas);
-          }
-
+          
           lastFilterRef.current = selectedFilter;
         }
 
