@@ -41,3 +41,4 @@ openapi.json
 # testing
 /experimental
 
+node_modules

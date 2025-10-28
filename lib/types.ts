@@ -17,7 +17,8 @@ export type PhotoFilter =
   | "bw-minimal"
   | "bw-v3"
   | "kodak-film"
-  | "kodak-portra";
+  | "kodak-portra"
+  | "crt";
 
 export interface CameraSettings {
   width: number;

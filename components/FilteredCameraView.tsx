@@ -55,11 +55,6 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
             applyFilter(canvas, selectedFilter);
           }
 
-          // Apply CRT effect only if it's the selected filter
-          if (selectedFilter === "crt") {
-            addCRTEffect(canvas);
-          }
-
           // Apply scanlines only if it's the selected filter
           if (selectedFilter === "scanlines") {
             addScanlines(canvas);
