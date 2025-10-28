@@ -66,6 +66,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   };
 
   const getCaptureButtonStyle = () => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const buttonSize = isMobile ? "120px" : "150px";
+    const buttonSizeImac = isMobile ? "130px" : "160px";
+    const fontSize = isMobile ? "14px" : "16px";
+    const fontSizeImac = isMobile ? "12px" : "15px";
+    const letterSpacing = isMobile ? "1px" : "2px";
+    const letterSpacingImac = isMobile ? "2px" : "3px";
+
     if (theme === "classic") {
       return {
         background: "radial-gradient(circle at 35% 35%, #800102 0%, #600001 60%, #4A0001 100%)",
@@ -74,11 +82,11 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         boxShadow: "inset 2px 2px 8px rgba(255, 248, 220, 0.08), 4px 6px 16px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(128, 1, 2, 0.2)",
         textShadow: "0 2px 4px rgba(0, 0, 0, 0.7)",
         textTransform: "uppercase" as const,
-        letterSpacing: "2px",
+        letterSpacing: letterSpacing,
         borderRadius: "50%",
-        width: "150px",
-        height: "150px",
-        fontSize: "16px",
+        width: buttonSize,
+        height: buttonSize,
+        fontSize: fontSize,
         fontWeight: "600" as const,
         display: "flex",
         alignItems: "center",
@@ -94,10 +102,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         boxShadow: "0 0 30px rgba(232, 180, 184, 0.4), 0 8px 24px rgba(212, 175, 55, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.3)",
         textShadow: "0 2px 4px rgba(112, 66, 20, 0.3)",
         textTransform: "uppercase" as const,
-        letterSpacing: "3px",
-        width: "160px",
-        height: "160px",
-        fontSize: "15px",
+        letterSpacing: letterSpacingImac,
+        width: buttonSizeImac,
+        height: buttonSizeImac,
+        fontSize: fontSizeImac,
         fontWeight: "700" as const,
         display: "flex",
         alignItems: "center",
@@ -115,17 +123,17 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Vintage carnival signage */}
       {theme === "classic" && (
-        <div className="text-center mb-4">
+        <div className="text-center mb-3 sm:mb-4">
           <span className="booth-signage">★ SAY CHEESE! ★</span>
         </div>
       )}
 
       {/* Photo Mode Selection */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">
           {theme === "classic" ? "ADJUSTMENTS" : theme === "imac" ? "SETTINGS" : "Photo Mode"}
         </h3>
         <div className="flex gap-2 flex-wrap">
@@ -145,8 +153,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
 
       {/* Filter Selection */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Filters</h3>
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Filters</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {filters.map((filter) => (
             <button
               key={filter}

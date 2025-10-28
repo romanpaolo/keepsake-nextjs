@@ -61,8 +61,8 @@ const PhotoStrip: React.FC<PhotoStripProps> = ({ photos, theme }) => {
       )}
 
       {/* Photo Grid */}
-      <div className="p-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div className="p-3 sm:p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-4">
           {photos.map((photo) => (
             <div key={photo.id} className="relative group">
               <Image

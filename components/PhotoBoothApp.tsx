@@ -17,7 +17,11 @@ interface PhotoBoothAppProps {
 const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
   const [photoMode, setPhotoMode] = useState<PhotoMode>("single");
   const [selectedFilter, setSelectedFilter] = useState<PhotoFilter>("none");
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photosByTheme, setPhotosByTheme] = useState<Record<string, Photo[]>>({
+    classic: [],
+    imac: [],
+    aqua: [],
+  });
   const [isFlashing, setIsFlashing] = useState(false);
   
   const filteredCameraRef = useRef<FilteredCameraViewHandle>(null);
@@ -66,7 +70,10 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
       playSound("shutter");
       const photo = await capturePhoto();
       if (photo) {
-        setPhotos(prev => [...prev, photo]);
+        setPhotosByTheme(prev => ({
+          ...prev,
+          [theme]: [...prev[theme], photo]
+        }));
       }
     } else if (photoMode === "burst") {
       // Start countdown
@@ -82,7 +89,10 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
         playSound("shutter");
         const photo = await capturePhoto();
         if (photo) {
-          setPhotos(prev => [...prev, photo]);
+          setPhotosByTheme(prev => ({
+            ...prev,
+            [theme]: [...prev[theme], photo]
+          }));
         }
         await new Promise(resolve => setTimeout(resolve, 500));
       }
@@ -107,11 +117,14 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
         const photo = await capturePhoto();
         if (photo) {
           stripPhotos.push(photo);
-          setPhotos(prev => [...prev, photo]);
+          setPhotosByTheme(prev => ({
+            ...prev,
+            [theme]: [...prev[theme], photo]
+          }));
         }
       }
     }
-  }, [hasPermission, isCountingDown, photoMode, capturePhoto, startCountdown]);
+  }, [hasPermission, isCountingDown, photoMode, capturePhoto, startCountdown, theme]);
 
   const getWindowClass = () => {
     switch (theme) {
@@ -127,7 +140,7 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6 sm:mt-8">
       {/* Camera Section */}
       <div className={getWindowClass()}>
         {theme === "classic" && (
@@ -155,10 +168,10 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
           </div>
         )}
 
-        <div className="p-6">
+        <div className="p-3 sm:p-4 md:p-6">
           {!hasPermission ? (
             <div className="text-center py-12">
-              <p className="mb-4 text-lg">Camera access is required to use the photobooth</p>
+              <p className="mb-4 text-base sm:text-lg">Camera access is required to use the photobooth</p>
               <button
                 onClick={requestPermission}
                 disabled={isLoading}
@@ -212,7 +225,7 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
           </div>
         )}
 
-        <div className="p-6">
+        <div className="p-3 sm:p-4 md:p-6">
           <ControlPanel
             theme={theme}
             photoMode={photoMode}
@@ -228,9 +241,9 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
 
 
       {/* Photo Strip Display */}
-      {photos.length > 0 && (
+      {photosByTheme[theme].length > 0 && (
         <div className="lg:col-span-2">
-          <PhotoStrip photos={photos} theme={theme} />
+          <PhotoStrip photos={photosByTheme[theme]} theme={theme} />
         </div>
       )}
     </div>
