@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { AppleTheme, PhotoFilter } from "@/lib/types";
-import { applyFilter, addCRTEffect, addScanlines } from "@/lib/filters";
+import { applyFilter } from "@/lib/filters";
 
 interface FilteredCameraViewProps {
   theme: AppleTheme;
@@ -53,16 +53,6 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
           // Apply selected filter (only one at a time)
           if (selectedFilter !== "none") {
             applyFilter(canvas, selectedFilter);
-          }
-
-          // Apply CRT effect only if it's the selected filter
-          if (selectedFilter === "crt") {
-            addCRTEffect(canvas);
-          }
-
-          // Apply scanlines only if it's the selected filter
-          if (selectedFilter === "scanlines") {
-            addScanlines(canvas);
           }
 
           lastFilterRef.current = selectedFilter;
