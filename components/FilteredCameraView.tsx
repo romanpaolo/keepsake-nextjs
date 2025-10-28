@@ -110,9 +110,7 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
           {theme === "classic" && (
             <>
               {/* Film grain texture */}
-              {selectedFilter !== "crt" && selectedFilter !== "scanlines" && (
-                <div className="absolute inset-0 film-grain pointer-events-none" />
-              )}
+              <div className="absolute inset-0 film-grain pointer-events-none" />
 
               {/* Focus center circle */}
               <div className="focus-center" />
@@ -155,7 +153,7 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
             </>
           )}
 
-          {theme === "aqua" && selectedFilter !== "scanlines" && selectedFilter !== "crt" && (
+          {theme === "aqua" && (
             <div className="absolute inset-0 scanline pointer-events-none" />
           )}
         </div>
