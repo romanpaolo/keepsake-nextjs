@@ -10,18 +10,14 @@ export interface Photo {
   filter?: PhotoFilter;
 }
 
-export type PhotoFilter = 
+export type PhotoFilter =
   | "none"
-  | "dither"
-  | "crt"
-  | "sepia"
-  | "ascii"
-  | "pixelate"
-  | "scanlines"
-  | "matrix"
-  | "gameboy"
-  | "thermal"
-  | "vhs";
+  | "35mm-film"
+  | "vintage-sepia"
+  | "bw-minimal"
+  | "bw-v3"
+  | "kodak-film"
+  | "kodak-portra";
 
 export interface CameraSettings {
   width: number;

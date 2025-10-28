@@ -41,12 +41,19 @@ export const useCamera = (settings: CameraSettings): UseCameraReturn => {
       };
 
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
+
+        // Wait for the video to be ready before playing
+        try {
+          await videoRef.current.play();
+        } catch (playError) {
+          // Ignore play errors - the video will auto-play when ready
+          console.log("Video play interrupted, will auto-play when ready");
+        }
       }
-      
+
       setStream(mediaStream);
       setHasPermission(true);
     } catch (err) {

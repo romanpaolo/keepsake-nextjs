@@ -98,9 +98,9 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
   const getWindowClass = () => {
     switch (theme) {
       case "classic":
-        return "mac-window";
+        return "vintage-booth-frame bg-vintage-booth-cream";
       case "imac":
-        return "imac-window p-6";
+        return "glamour-window p-6";
       case "aqua":
         return "aqua-window";
       default:
@@ -113,11 +113,19 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
       {/* Camera Section */}
       <div className={getWindowClass()}>
         {theme === "classic" && (
-          <div className="mac-title-bar">
-            <span>PhotoBooth</span>
+          <div className="vintage-booth-bar">
+            <span>PHOTO BOOTH</span>
+            <span style={{ fontSize: '10px', letterSpacing: '1px', opacity: 0.8 }}>EST. 1975</span>
           </div>
         )}
-        
+
+        {theme === "imac" && (
+          <div className="glamour-title-bar">
+            <span>STUDIO</span>
+            <span style={{ fontSize: '10px', letterSpacing: '1.5px', opacity: 0.9 }}>CAPTURE YOUR ELEGANCE</span>
+          </div>
+        )}
+
         {theme === "aqua" && (
           <div className="aqua-title-bar">
             <div className="traffic-lights">
@@ -136,7 +144,7 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
               <button
                 onClick={requestPermission}
                 disabled={isLoading}
-                className={theme === "classic" ? "mac-button" : theme === "imac" ? "imac-button" : "aqua-button"}
+                className={theme === "classic" ? "vintage-button" : theme === "imac" ? "glamour-button" : "aqua-button"}
               >
                 {isLoading ? "Requesting..." : "Allow Camera Access"}
               </button>
@@ -162,11 +170,19 @@ const PhotoBoothApp: React.FC<PhotoBoothAppProps> = ({ theme }) => {
       {/* Controls Section */}
       <div className={getWindowClass()}>
         {theme === "classic" && (
-          <div className="mac-title-bar">
-            <span>Controls</span>
+          <div className="vintage-booth-bar">
+            <span>ADJUSTMENTS</span>
+            <span style={{ fontSize: '10px', letterSpacing: '1px', opacity: 0.8 }}>READY IN 60 SEC</span>
           </div>
         )}
-        
+
+        {theme === "imac" && (
+          <div className="glamour-title-bar">
+            <span>ENHANCE</span>
+            <span style={{ fontSize: '10px', letterSpacing: '1.5px', opacity: 0.9 }}>REFINE YOUR LOOK</span>
+          </div>
+        )}
+
         {theme === "aqua" && (
           <div className="aqua-title-bar">
             <div className="traffic-lights">

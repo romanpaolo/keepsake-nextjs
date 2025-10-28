@@ -14,9 +14,18 @@ const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ count, theme }) => 
       case "imac":
         return "text-imac-bondi-blue text-9xl font-bold";
       case "aqua":
-        return "text-aqua-blue text-9xl font-bold text-shadow-lg";
+        return "text-9xl font-bold";
       default:
         return "text-9xl font-bold";
+    }
+  };
+
+  const getCountdownColor = () => {
+    switch (theme) {
+      case "aqua":
+        return "#F9F5E8";
+      default:
+        return undefined;
     }
   };
 
@@ -25,6 +34,7 @@ const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ count, theme }) => 
       <div
         className={`${getCountdownStyle()} animate-pulse transform scale-150`}
         style={{
+          color: getCountdownColor(),
           textShadow: theme === "aqua" ? "0 4px 8px rgba(0, 0, 0, 0.3)" : undefined,
         }}
       >

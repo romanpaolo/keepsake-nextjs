@@ -83,9 +83,9 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
     const getThemeClasses = () => {
       switch (theme) {
         case "classic":
-          return "border-4 border-black bg-black";
+          return "photo-mat-border";
         case "imac":
-          return "rounded-2xl overflow-hidden border-4 border-imac-bondi-blue";
+          return "glamour-photo-frame";
         case "aqua":
           return "rounded-lg overflow-hidden shadow-2xl";
         default:
@@ -95,7 +95,7 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
 
     return (
       <div className="relative">
-        <div className={`relative ${getThemeClasses()}`}>
+        <div className={`relative ${getThemeClasses()} ${theme === "classic" ? "vintage-viewfinder" : theme === "imac" ? "glamour-viewfinder" : ""}`}>
           {/* Hidden video element */}
           <video
             ref={videoRef}
@@ -104,21 +104,65 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
             playsInline
             muted
           />
-          
+
           {/* Visible canvas with filters */}
           <canvas
             ref={canvasRef}
             className="w-full h-full object-cover"
           />
-          
+
           {/* Flash effect overlay */}
           {isFlashing && (
             <div className="absolute inset-0 bg-white flash-effect pointer-events-none" />
           )}
 
-          {/* Theme-specific CSS effects (only when no conflicting filter is selected) */}
-          {theme === "classic" && selectedFilter !== "crt" && selectedFilter !== "scanlines" && (
-            <div className="absolute inset-0 crt-effect pointer-events-none" />
+          {/* VINTAGE PHOTOBOOTH OVERLAYS */}
+          {theme === "classic" && (
+            <>
+              {/* Film grain texture */}
+              {selectedFilter !== "crt" && selectedFilter !== "scanlines" && (
+                <div className="absolute inset-0 film-grain pointer-events-none" />
+              )}
+
+              {/* Focus center circle */}
+              <div className="focus-center" />
+
+              {/* Film info counter */}
+              <div className="film-info">
+                24 | {new Date().toLocaleDateString('en-US', { month: 'short', year: '2-digit' }).toUpperCase().replace(' ', " '")}
+              </div>
+
+              {/* Ready indicator */}
+              <div className="ready-indicator">READY IN 60 SEC</div>
+
+              {/* Light leak overlay */}
+              <div className="light-leak-overlay" />
+
+              {/* Date stamp */}
+              <div className="vintage-date-stamp">
+                {new Date().toLocaleDateString('en-US', { month: 'short', year: '2-digit' }).toUpperCase().replace(' ', " '")}
+              </div>
+            </>
+          )}
+
+          {/* GLAMOUR STUDIO OVERLAYS */}
+          {theme === "imac" && (
+            <>
+              {/* Ring light glow */}
+              <div className="ring-light-glow" />
+
+              {/* Glamour vignette */}
+              <div className="glamour-vignette" />
+
+              {/* Bokeh particles */}
+              <div className="bokeh-overlay" />
+
+              {/* Camera settings display */}
+              <div className="camera-settings">f/1.8 | ISO 200</div>
+
+              {/* Glamour status */}
+              <div className="glamour-status">Portrait Mode</div>
+            </>
           )}
 
           {theme === "aqua" && selectedFilter !== "scanlines" && selectedFilter !== "crt" && (
@@ -126,9 +170,12 @@ const FilteredCameraView = forwardRef<FilteredCameraViewHandle, FilteredCameraVi
           )}
         </div>
 
-        {/* Theme-specific decorations */}
-        {theme === "imac" && (
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-32 h-8 bg-gradient-to-b from-gray-300 to-gray-400 rounded-b-full" />
+        {/* Film sprocket holes for vintage theme */}
+        {theme === "classic" && (
+          <>
+            <div className="film-sprockets-left" />
+            <div className="film-sprockets-right" />
+          </>
         )}
       </div>
     );

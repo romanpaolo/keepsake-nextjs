@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Retro Apple PhotoBooth",
+  title: "Keepsake",
   description: "A nostalgic journey through Apple's design history with a modern photobooth twist",
   icons: {
     icon: "/favicon.ico",
